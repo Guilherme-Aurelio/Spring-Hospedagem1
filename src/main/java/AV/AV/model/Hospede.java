@@ -1,7 +1,6 @@
 package AV.AV.model;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /*import org.springframework.format.annotation.DateTimeFormat;*/
@@ -13,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,7 +35,8 @@ public class Hospede {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
+    @NotBlank
     private String nome;
 
     /*@DateTimeFormat*/

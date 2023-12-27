@@ -1,7 +1,6 @@
 package AV.AV.model;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,10 +43,12 @@ realizou a reserva. */
 
     @ManyToOne
     @JoinColumn(name="acomodacao_id")
+    @NotNull(message = "A acomodação é obrigatória")
     private Acomodacao acomodacao;
 
     @ManyToOne
     @JoinColumn(name = "hospede_id")
+    @NotNull(message = "O hóspede é obrigatório")
     private Hospede hospede;
 
 }
