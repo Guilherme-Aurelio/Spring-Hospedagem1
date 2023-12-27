@@ -16,12 +16,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import AV.AV.infra.exceptions.LimiteReservasException;
 import AV.AV.model.Hospede;
 import AV.AV.model.Reserva;
 import AV.AV.repository.ReservaRepository;
+import AV.AV.service.ReservaService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 @RestController
@@ -31,16 +35,30 @@ public class ReservaController {
     @Autowired
     private ReservaRepository repository;
 
+    @Autowired
+    private ReservaService reservaService;
+
 
     @PostMapping
     @Transactional
     //@PreAuthorize("hasAuthority('ROLE_ADMIN')")
     //@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public ResponseEntity<Object> cadastrar(@RequestBody @Valid Reserva reserva,
+    public ResponseEntity<Object> cadastrar(
+            @RequestParam Long hospedeId,
+            @RequestParam Long acomodacaoId, 
             UriComponentsBuilder uriBuilder) {
-        Reserva reservaLocal = repository.save(reserva);
-        var uri = uriBuilder.path("/reservas/{id}").buildAndExpand(reservaLocal.getId()).toUri();
-        return ResponseEntity.created(uri).build();
+        try {
+            Reserva reserva = reservaService.cadastrar(hospedeId, acomodacaoId);
+
+            Reserva reservaLocal = repository.save(reserva);
+            var uri = uriBuilder.path("/reservas/{id}").buildAndExpand(reservaLocal.getId()).toUri();
+
+            return ResponseEntity.created(uri).body(reserva);
+        } catch (LimiteReservasException excp) {
+            return new ResponseEntity<>(excp.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (EntityNotFoundException excp) {
+            return new ResponseEntity<>(excp.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/{id}")
